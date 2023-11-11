@@ -1,19 +1,16 @@
 library video_editor_sdk;
 
 import 'dart:io';
-import 'dart:math';
-
 import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:video_editor_sdk/editor_data.dart';
+import 'package:video_editor_sdk/gen_util.dart';
 
 class VideoEditorSdk {
-  final _chars =
-      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  final Random _rnd = Random();
-
+  final GenUtil _genUtil = GenUtil();
   Future<String?> applyMultipleStickerOnVideo({
     required String inputVideoPath,
     required List<EditorData> editorData,
@@ -43,10 +40,10 @@ class VideoEditorSdk {
     int? Y,
   }) async {
     if (outputVideoPath == null || outputVideoPath.isEmpty) {
-      await _createFolder();
+      await _genUtil.createFolder();
       Directory documentsDirectory = await getApplicationDocumentsDirectory();
       outputVideoPath =
-          '${documentsDirectory.path}/temp_files/${_getRandomString(10)}.mp4';
+          '${documentsDirectory.path}/temp_files/${_genUtil.getRandomString(10)}.mp4';
     }
 
     String overlayCommand =
@@ -78,42 +75,5 @@ class VideoEditorSdk {
       return null;
     }
   }
-
-  Future<void> _createFolder() async {
-    try {
-      Directory documentsDirectory = await getApplicationDocumentsDirectory();
-      String outputPath = '${documentsDirectory.path}/temp_files';
-      final dir = Directory(outputPath);
-      if (!dir.existsSync()) {
-        dir.createSync(recursive: true);
-      }
-    } catch (e) {
-      debugPrint("error creating directory!");
-    }
-  }
-
-  String _getRandomString(int length) => String.fromCharCodes(
-        Iterable.generate(
-          length,
-          (_) => _chars.codeUnitAt(
-            _rnd.nextInt(_chars.length),
-          ),
-        ),
-      );
 }
 
-class EditorData {
-  String stickerPath;
-  int from;
-  int to;
-  int X;
-  int Y;
-
-  EditorData({
-    required this.stickerPath,
-    required this.from,
-    required this.to,
-    this.X = 0,
-    this.Y = 0,
-  });
-}
