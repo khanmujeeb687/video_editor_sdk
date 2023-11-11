@@ -8,9 +8,37 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_editor_sdk/editor_data.dart';
 import 'package:video_editor_sdk/gen_util.dart';
+import 'package:video_editor_sdk/screenshot_util.dart';
 
 class VideoEditorSdk {
   final GenUtil _genUtil = GenUtil();
+  final ScreenshotUtil _screenshotUtil = ScreenshotUtil();
+
+  Future<String?> applyWidgetOnVideo({
+    required String inputVideoPath,
+    required Widget widget,
+    required BuildContext context,
+    required int fromDuration,
+    required int toDuration,
+    String? outputVideoPath,
+    int? X,
+    int? Y,
+  }) async {
+    return applyStickerOnVideo(
+      inputVideoPath: inputVideoPath,
+      stickerPath: (await _screenshotUtil.captureScreenShotFromWidget(
+        widget,
+        filename: _genUtil.getRandomString(10),
+        context: context,
+      ))!,
+      fromDuration: fromDuration,
+      toDuration: toDuration,
+      X: X,
+      Y: Y,
+      outputVideoPath: outputVideoPath,
+    );
+  }
+
   Future<String?> applyMultipleStickerOnVideo({
     required String inputVideoPath,
     required List<EditorData> editorData,
@@ -76,4 +104,3 @@ class VideoEditorSdk {
     }
   }
 }
-
